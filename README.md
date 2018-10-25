@@ -11,6 +11,48 @@ Currently classy supports private and public methods via the respective keyword 
 ## Usage
 
 ### Writing classes
+
+```
+local classy = require "classy"
+local class = classy.class
+local public = classy.public
+local private = classy.private
+
+
+class "Greeter" {
+
+    public {
+        say_hello = function(name)
+            self.private_hello(name)
+        end
+    };
+
+    private {
+        private_hello = function(name)
+            print("Hello "..name)
+        end
+    }
+}
+```
+
+### Instantiating objects
+
+```
+local classy = require "classy"
+local import = classy.import
+
+local Greeter = import("Greeter")
+local greeter = Greeter:new()
+
+greeter.say_hello("World")
+-- Output: Hello World
+
+greeter.private_hello("World")
+-- Output: Error. Trying to access private member private_hello
+```
+
+### Inheritence
+
 ```
 local classy = require "classy"
 local class = classy.class
@@ -19,50 +61,64 @@ local private = classy.private
 
 
 class "Person" {
-    public "constructor" { function(name)
-        self.name = name
-    end };
 
-    public "introduce" { function()
-        self.privatePrint()
-    end };
+    extends "Greeter";
 
-    private "privatePrint" { function()
-        print("Hi! My name is "..self.name)
-    end };
+
+    public {
+        constructor = function(name)
+            self.name = name
+        end;
+
+        introduce = function()
+            print("Hi! My name is "..self.name)
+        end;
+    };
 }
-```
 
-### Instantiating objects
-```
-local classy = require "classy"
-local import = classy.import
 local Person = import("Person")
 
 local slim = Person:new("Slim Shady")
+
 slim.introduce()
+-- Output: Hi! My name is Slim Shady
 
---error trying to access private member
-slim.privatePrint()
+slim.say_hello("World")
+-- Output: Hello World
 ```
 
-### Issues with Empire at War
+### Polymorphism
 
-When passing game objects (userdata) as arguments to member functions the game seems to "forget" about all functionality the game object has.
-
-Example:
 ```
-class "MyClass" {
-  public "constructor" { function(planet)
-    self.planetOwner = planet.Get_Owner() -- will throw an error, saying that Get_Owner() is a nil value
-  end }
+class "Person" {
+
+    extends "Greeter";
+
+
+    public {
+        constructor = function(name)
+            self.name = name
+        end;
+
+        introduce = function()
+            print("Hi! My name is "..self.name)
+        end;
+
+        say_hello = function(name)
+            super.say_hello(name)
+            print("Hello Override")
+        end;
+    };
+
 }
+
+local Person = import("Person")
+
+local slim = Person:new("Slim Shady")
+
+slim.say_hello("World")
+-- Output: 
+-- Hello World
+-- Hello Override
+
 ```
-
-Moreover after saving and then loading a save game the function environment for the class methods is lost, resulting in `self` being nil.
-
-Both errors seem to be connected to `setfenv()`, therefore a solution that doesn't rely on that function must be found.
-
-### Other issues
-
-The provided example works fine with the regular lua 5.1 compiler, but fails with luajit.

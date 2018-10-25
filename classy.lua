@@ -4,19 +4,23 @@ local classes = {
     tableLookUp = {}
 }
 
-local function private(name)
-    classes.nextName = name
-    return function(tab)
-        classes[classes.currentDef].privateDefs[classes.nextName] = tab[1]
-        classes.nextName = nil
+local function import(name)
+    return classes[name].class
+end
+
+local function extends(className)
+    classes[classes.currentDef].extends = className
+end
+
+local function private(tab)
+    for funcName, func in pairs(tab) do
+        classes[classes.currentDef].privateDefs[funcName] = func
     end
 end
 
-local function public(name)
-    classes.nextName = name
-    return function(tab)
-        classes[classes.currentDef].publicDefs[classes.nextName] = tab[1]
-        classes.nextName = nil
+local function public(tab)
+    for funcName, func in pairs(tab) do
+        classes[classes.currentDef].publicDefs[funcName] = func
     end
 end
 
@@ -25,6 +29,7 @@ local function class(name)
     classes[classes.currentDef] = {
         privateDefs = {},
         publicDefs = {},
+        extends = nil,
         class = nil
     }
 
@@ -37,6 +42,28 @@ local function class(name)
             local classdef = classes[classes.tableLookUp[self]]
             local privateObj = {}
             local publicObj = {}
+
+            local env = {self = privateObj}
+            setmetatable(env, {__index = _G})
+
+            if classdef.extends then
+                local superClass = import(classdef.extends)
+                local super = superClass:new(unpack(arg))
+
+                for funcName, func in pairs(super) do
+                    if type(func) == "function" and funcName ~= "constructor" then
+                        local funcWrapper = function(...)
+                            func(unpack(arg))
+                        end
+
+                        privateObj[funcName] = funcWrapper
+                        publicObj[funcName] = funcWrapper
+
+                    end
+                end
+
+                env.super = super
+            end
 
             for funcName, func in pairs(classdef.privateDefs) do
                 local clone_func = loadstring(string.dump(func))
@@ -52,8 +79,6 @@ local function class(name)
                 publicObj[funcName] = clone_func
             end
 
-            local env = {self = privateObj}
-            setmetatable(env, {__index = _G})
             for _, v in pairs(privateObj) do
                 if type(v) == "function" then
                     setfenv(v, env)
@@ -71,13 +96,10 @@ local function class(name)
     end
 end
 
-local function import(name)
-    return classes[name].class
-end
-
 return {
     private = private,
     public = public,
+    extends = extends,
     class = class,
     import = import
 }
