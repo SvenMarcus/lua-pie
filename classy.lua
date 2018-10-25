@@ -53,13 +53,8 @@ local function class(name)
 
                 for funcName, func in pairs(super) do
                     if type(func) == "function" and funcName ~= "constructor" then
-                        local funcWrapper = function(...)
-                            func(unpack({...}))
-                        end
-
-                        privateObj[funcName] = funcWrapper
-                        publicObj[funcName] = funcWrapper
-
+                        privateObj[funcName] = func
+                        publicObj[funcName] = func
                     end
                 end
 
