@@ -43,17 +43,18 @@ local function class(name)
             local privateObj = {}
             local publicObj = {}
 
+            local args = {...}
             local env = {self = privateObj}
             setmetatable(env, {__index = _G})
 
             if classdef.extends then
                 local superClass = import(classdef.extends)
-                local super = superClass:new(unpack(arg))
+                local super = superClass:new(unpack(args))
 
                 for funcName, func in pairs(super) do
                     if type(func) == "function" and funcName ~= "constructor" then
                         local funcWrapper = function(...)
-                            func(unpack(arg))
+                            func(unpack({...}))
                         end
 
                         privateObj[funcName] = funcWrapper
@@ -86,7 +87,7 @@ local function class(name)
             end
 
             if publicObj.constructor then
-                publicObj.constructor(unpack(arg))
+                publicObj.constructor(unpack(args))
                 publicObj.constructor = nil
             end
 
