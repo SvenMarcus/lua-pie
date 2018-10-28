@@ -1,11 +1,55 @@
 local classes = {
     currentDef = nil,
     nextName = nil,
-    tableLookUp = {}
+    environments = {}
 }
 
 local function import(name)
-    return classes[name].class
+
+    return setmetatable(
+        {},
+        {__call = function(t, ...)
+            local obj = {}
+
+            local env = {self = {}}
+            classes.environments[obj] = env
+
+            setmetatable(env, {__index = _G})
+
+
+            local self_mt = {
+                __index = function(t, key)
+                    local class = classes[name]
+                    local publicDefs = class.publicDefs
+                    local privateDefs = class.privateDefs
+                    local func = publicDefs[key] or privateDefs[key]
+                    if func and type(func) == "function" then
+                        return setfenv(func, env)
+                    end
+
+                    if env.super then
+                        return super[key]
+                    end
+
+                    error("attempt to call field ".."'"..key.."'".." (a nil value)--")
+                end
+            }
+
+            if classes[name].extends then
+                local super = import(classes[name].extends)()
+                env.super = super
+            end
+
+            setmetatable(env.self, self_mt)
+            setmetatable(obj, classes[name].class)
+
+            if classes[name].publicDefs.constructor then
+                obj.constructor(unpack({...}))
+            end
+
+            return obj
+        end}
+    )
 end
 
 local function extends(className)
@@ -34,60 +78,37 @@ local function class(name)
     }
 
     return function(tab)
-        classes[classes.currentDef].class = tab
-        classes.tableLookUp[tab] = classes.currentDef
 
-        function tab:new(...)
+        local obj_mt = {
+            env = {self = {}},
+            __index = function(t, key)
+                local class = classes[name]
+                local objPublic = class.publicDefs
+                local func = objPublic[key]
+                local objEnvironment = classes.environments[t]
 
-            local classdef = classes[classes.tableLookUp[self]]
-            local privateObj = {}
-            local publicObj = {}
+                if func and type(func) == "function" then
+                    return setfenv(func, objEnvironment)
+                end
 
-            local args = {...}
-            local env = {self = privateObj}
-            setmetatable(env, {__index = _G})
 
-            if classdef.extends then
-                local superClass = import(classdef.extends)
-                local super = superClass:new(unpack(args))
 
-                for funcName, func in pairs(super) do
-                    if type(func) == "function" and funcName ~= "constructor" then
-                        privateObj[funcName] = func
-                        publicObj[funcName] = func
+                if classes[name].extends then
+                    local super = classes[classes[name].extends]
+                    local superPublic = super.publicDefs
+
+                    func = superPublic[key]
+                    if func and type(func) == "function" then
+                        return setfenv(func, classes.environments[objEnvironment.super])
                     end
                 end
 
-                env.super = super
+                error("Trying to access non existing or private member "..tostring(key))
             end
+        }
 
-            for funcName, func in pairs(classdef.privateDefs) do
-                local clone_func = loadstring(string.dump(func))
-                privateObj[funcName] = clone_func
-                publicObj[funcName] = function()
-                    error("Error. Trying to access private member "..funcName)
-                end
-            end
+        classes[name].class = obj_mt
 
-            for funcName, func in pairs(classdef.publicDefs) do
-                local clone_func = loadstring(string.dump(func))
-                privateObj[funcName] = clone_func
-                publicObj[funcName] = clone_func
-            end
-
-            for _, v in pairs(privateObj) do
-                if type(v) == "function" then
-                    setfenv(v, env)
-                end
-            end
-
-            if publicObj.constructor then
-                publicObj.constructor(unpack(args))
-                publicObj.constructor = nil
-            end
-
-            return publicObj
-        end
         classes.currentDef = nil
     end
 end
