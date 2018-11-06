@@ -1,55 +1,11 @@
 local classes = {
     currentDef = nil,
     nextName = nil,
-    environments = {}
+    tableLookUp = {}
 }
 
 local function import(name)
-
-    return setmetatable(
-        {},
-        {__call = function(t, ...)
-            local obj = {}
-
-            local env = {self = {}}
-            classes.environments[obj] = env
-
-            setmetatable(env, {__index = _G})
-
-
-            local self_mt = {
-                __index = function(t, key)
-                    local class = classes[name]
-                    local publicDefs = class.publicDefs
-                    local privateDefs = class.privateDefs
-                    local func = publicDefs[key] or privateDefs[key]
-                    if func and type(func) == "function" then
-                        return setfenv(func, env)
-                    end
-
-                    if env.super then
-                        return super[key]
-                    end
-
-                    error("attempt to call field ".."'"..key.."'".." (a nil value)--")
-                end
-            }
-
-            if classes[name].extends then
-                local super = import(classes[name].extends)()
-                env.super = super
-            end
-
-            setmetatable(env.self, self_mt)
-            setmetatable(obj, classes[name].class)
-
-            if classes[name].publicDefs.constructor then
-                obj.constructor(unpack({...}))
-            end
-
-            return obj
-        end}
-    )
+    return classes[name].class
 end
 
 local function extends(className)
@@ -79,36 +35,76 @@ local function class(name)
 
     return function(tab)
 
-        local obj_mt = {
-            env = {self = {}},
-            __index = function(t, key)
-                local class = classes[name]
-                local objPublic = class.publicDefs
-                local func = objPublic[key]
-                local objEnvironment = classes.environments[t]
+        local classdef = classes[name]
 
-                if func and type(func) == "function" then
-                    return setfenv(func, objEnvironment)
+        local class_mt = {
+            __call = function(t, ...)
+
+                local privateObj = {}
+                local env = {self = privateObj}
+                setmetatable(env, {__index = _G})
+
+                local superDef
+                local super
+                if classdef.extends then
+                    superDef = classes[classdef.extends]
+                    local superClass = import(classdef.extends)
+                    super = superClass(...)
+                    env.super = super
                 end
 
+                setmetatable(privateObj, {__index = function(t, k)
+                    local func = classdef.privateDefs[k] or classdef.publicDefs[k]
 
-
-                if classes[name].extends then
-                    local super = classes[classes[name].extends]
-                    local superPublic = super.publicDefs
-
-                    func = superPublic[key]
-                    if func and type(func) == "function" then
-                        return setfenv(func, classes.environments[objEnvironment.super])
+                    if type( func ) == "function" then
+                        return setfenv(func, env)
                     end
+
+                    if not func and superDef then
+                        return super[k]
+                    end
+
+                    return func
+                end} )
+
+                local public_mt = {
+                    __index = function(t, k)
+                        if not classdef.publicDefs[k] then
+                            if superDef then
+                                if not superDef.publicDefs[k] then
+                                    return
+                                end
+                            else
+                                return
+                            end
+                        end
+
+                        local func = classdef.publicDefs[k]
+
+                        if type(func) == "function" then
+                            return setfenv(func, env)
+                        end
+
+                        if not func and superDef then
+                            return super[k]
+                        end
+
+                        return func
+                    end;
+                }
+
+                local publicObj = setmetatable({}, public_mt)
+
+                local constructor = publicObj.constructor
+                if constructor then
+                    constructor(...)
                 end
 
-                error("Trying to access non existing or private member "..tostring(key))
+                return publicObj
             end
         }
 
-        classes[name].class = obj_mt
-
+        classes[name].class = setmetatable( {}, class_mt )
         classes.currentDef = nil
     end
 end
