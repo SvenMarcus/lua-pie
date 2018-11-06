@@ -4,9 +4,13 @@ Classy is class library prototype for Lua.
 
 ## Overview
 
-Classy was intended to be used in modifications for Star Wars Empire at War - Forces of Corruption. Since game produces corrupt save games when using multiple meta tables or upvalues, their usage was avoided wherever possible. In the end the library still cannot be used for the game in its current form due to engine limitations with `setfenv()`.
+Classy was intended to be used in modifications for Star Wars Empire at War - Forces of Corruption. Since the game produces corrupt save games when using multiple meta tables or upvalues, their usage was avoided wherever possible. In the end the library still cannot be used for the game in its current form due to engine limitations with `setfenv()`.
 
 Currently classy supports private and public methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
+
+### Experimental branch
+
+The experimental branch explores an alternative metatable based implementation of classy (while keeping the same public API) with the goal of improving performance. The main branch implementation is rather memory inefficient and slow on object creation due to cloning of functions via `loadstring(string.dump(func))`. The metatable based implementation provides faster object creation, but loses out on performance for complex tasks.
 
 ## Usage
 
