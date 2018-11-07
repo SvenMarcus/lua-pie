@@ -3,6 +3,7 @@ local os = require "os"
 
 local classy = require "classy"
 local class = classy.class
+local static = classy.static
 local public = classy.public
 local private = classy.private
 local extends = classy.extends
@@ -138,8 +139,8 @@ class "GridSolver" {
 	private {
 		initArrays = function(self)
 			local numNodes = self.grid:getNumNodes()
-			self.lastStepValues = self:zeros(numNodes)
-			self.newStepValues = self:zeros(numNodes)
+			self.lastStepValues = self.zeros(numNodes)
+			self.newStepValues = self.zeros(numNodes)
 			self.lastStepValues[1] = self.grid:getLeftBC()
 			self.lastStepValues[#self.lastStepValues] = self.grid:getRightBC()
 			self.newStepValues[1] = self.grid:getLeftBC()
@@ -162,14 +163,17 @@ class "GridSolver" {
 			self.newStepValues = tmp
 		end;
 
-		zeros = function(self, num)
+	};
+
+	static {
+		zeros = function(num)
 			local t = {}
 			for _=1, num do
 				table.insert(t, 0)
 			end
 			return t
 		end;
-	};
+	}
 }
 
 

@@ -1,7 +1,5 @@
 local classes = {
-    currentDef = nil,
-    nextName = nil,
-    tableLookUp = {}
+    currentDef = nil
 }
 
 local function import(name)
@@ -13,28 +11,34 @@ local function extends(className)
 end
 
 local function private(tab)
-    for funcName, func in pairs(tab) do
-        classes[classes.currentDef].privateDefs[funcName] = func
+    for key, value in pairs(tab) do
+        if type(value) == "function" then
+            classes[classes.currentDef].privateFuncDefs[key] = value
+        else
+            error("Currently only functions in private definitions are supported")
+        end
     end
 end
 
 local function public(tab)
-    for funcName, func in pairs(tab) do
-        classes[classes.currentDef].publicDefs[funcName] = func
+    for key, value in pairs(tab) do
+        if type(value) == "function" then
+            classes[classes.currentDef].publicFuncDefs[key] = value
+        else
+            error("Currently only functions in public definitions are supported")
+        end
     end
 end
 
-local function isPrivate(classdef, key)
-    return classdef.privateDefs[key] ~= nil
-end
-
-local function isPublic(classdef, key)
-    return classdef.publicDefs[key] ~= nil
+local function static(tab)
+    for key, value in pairs(tab) do
+        classes[classes.currentDef].staticDefs[key] = value
+    end
 end
 
 local function inSuper(classdef, key)
     if classdef.extends then
-        return classes[classdef.extends].publicDefs[key] ~= nil
+        return classes[classdef.extends].publicFuncDefs[key] ~= nil
     end
     return false
 end
@@ -42,80 +46,107 @@ end
 local function class(name)
     classes.currentDef = name
     classes[classes.currentDef] = {
-        privateDefs = {},
-        publicDefs = {},
+        staticDefs = {},
+        privateFuncDefs = {},
+        publicFuncDefs = {},
         extends = nil,
         class = nil
     }
 
-    return function(tab)
+    return function(_)
 
         local classdef = classes[name]
 
-        local class_mt = {
-            __call = function(t, ...)
+        classes[name].class = setmetatable( {}, {
+            __index = classdef.staticDefs,
 
-                local privateObj = {}
+            __call = function(_, ...)
 
-                local super
-                if classdef.extends then
-                    local superClass = import(classdef.extends)
-                    super = superClass(...)
-                    privateObj.super = super
-                end
+                    local privateObj = {}
 
-                local private_mt = {}
-
-                local function wrapperFunction(_, ...)
-                    return private_mt.func(privateObj, ...)
-                end
-
-                private_mt.__index = function(t, k)
-                    local func = classdef.privateDefs[k] or classdef.publicDefs[k]
-                    if type(func) == "function" then
-                        private_mt.func = func
-                        return wrapperFunction
+                    local super
+                    if classdef.extends then
+                        local superClass = import(classdef.extends)
+                        super = superClass(...)
+                        privateObj.super = super
                     end
 
-                    return rawget(t, k)
-                end
+                    local private_mt = {}
 
-                setmetatable(privateObj, private_mt)
+                    local function wrapperFunction(_, ...)
+                        return private_mt.func(privateObj, ...)
+                    end
 
-                local public_mt = {
-                    __index = function(t, k)
-                        if isPublic(classdef, k) and not isPrivate(classdef, k) then
-                            return privateObj[k]
-                        elseif isPrivate(classdef, k) then
-                            error("Trying to access private member "..tostring(k))
-                        elseif inSuper(classdef, k) then
-                            return rawget(privateObj, "super")[k]
+                    private_mt.__index = function(t, k)
+                        local member = classdef.privateFuncDefs[k] or classdef.publicFuncDefs[k]
+                        if member then
+                            if type(member) == "function" then
+                                private_mt.func = member
+                                return wrapperFunction
+                            end
                         else
-                            error("Trying to access non existing member "..tostring(k))
+                            member = classdef.staticDefs[k]
+                            if member then
+                                return member
+                            end
                         end
-                    end;
-                    __newindex = function(t, k)
-                        error("Adding new indices for classes is not allowed")
-                    end;
-                }
 
-                local publicObj = setmetatable({}, public_mt)
+                        return rawget(t, k)
+                    end
 
-                local constructor = classdef.publicDefs.constructor
-                if constructor then
-                    constructor(privateObj, ...)
+                    private_mt.__newindex = function(t, k, v)
+                        if classdef.staticDefs[k] then
+                            classdef.staticDefs[k] = v
+                            return
+                        end
+                        rawset(t, k, v)
+                    end
+
+                    setmetatable(privateObj, private_mt)
+
+                    local public_mt = {
+                        __index = function(_, k)
+                            local static_member = classdef.staticDefs[k]
+                            local isPublic = classdef.publicFuncDefs[k] ~= nil
+                            local isPrivate = classdef.privateFuncDefs[k] ~= nil
+
+                            if (isPublic or static_member) and not isPrivate then
+                                return privateObj[k]
+                            elseif isPrivate then
+                                error("Trying to access private member "..tostring(k))
+                            elseif inSuper(classdef, k) then
+                                return rawget(privateObj, "super")[k]
+                            else
+                                error("Trying to access non existing member "..tostring(k))
+                            end
+                        end;
+                        __newindex = function(_, k, v)
+                            local static_member = classdef.staticDefs[k]
+                            if static_member then
+                                classdef.staticDefs[k] = v
+                                return
+                            end
+                            error("Adding new indices for classes is not allowed")
+                        end;
+                    }
+
+                    local publicObj = setmetatable({}, public_mt)
+
+                    local constructor = classdef.publicFuncDefs.constructor
+                    if constructor then
+                        constructor(privateObj, ...)
+                    end
+
+                    return publicObj
                 end
+        })
 
-                return publicObj
-            end
-        }
-
-        classes[name].class = setmetatable( {}, class_mt )
         classes.currentDef = nil
     end
 end
 
 return {
+    static = static,
     private = private,
     public = public,
     extends = extends,

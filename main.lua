@@ -1,6 +1,7 @@
 local os = require "os"
 local classy = require "classy"
 local class = classy.class
+local static = classy.static
 local public = classy.public
 local private = classy.private
 local extends = classy.extends
@@ -26,9 +27,16 @@ class "Person" {
 
 	extends "Greeter";
 
+	static {
+		count = 0
+	};
+
     public {
+
 		constructor = function(self, name)
 			self.name = name
+			print(self.name)
+			self.count = self.count + 1
 		end;
 
 		introduce = function(self)
@@ -52,13 +60,21 @@ local Greeter = import("Greeter")
 local greeter = Greeter()
 
 greeter:say_hello("World")
+-- greeter:private_hello()
 
 
 local Person = import("Person")
 local slim = Person("Slim Shady")
+
+print(slim.count)
+
 local jimmy = Person("Jimmy")
 
 slim:introduce()
 slim:say_hello("World")
 
 jimmy:introduce()
+
+print(slim.count)
+print(jimmy.count)
+
