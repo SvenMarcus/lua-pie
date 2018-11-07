@@ -24,6 +24,21 @@ local function public(tab)
     end
 end
 
+local function isPrivate(classdef, key)
+    return classdef.privateDefs[key] ~= nil
+end
+
+local function isPublic(classdef, key)
+    return classdef.publicDefs[key] ~= nil
+end
+
+local function inSuper(classdef, key)
+    if classdef.extends then
+        return classes[classdef.extends].publicDefs[key] ~= nil
+    end
+    return false
+end
+
 local function class(name)
     classes.currentDef = name
     classes[classes.currentDef] = {
@@ -34,60 +49,68 @@ local function class(name)
     }
 
     return function(tab)
-        classes[classes.currentDef].class = tab
-        classes.tableLookUp[tab] = classes.currentDef
 
-        function tab:new(...)
+        local classdef = classes[name]
 
-            local classdef = classes[classes.tableLookUp[self]]
-            local privateObj = {}
-            local publicObj = {}
+        local class_mt = {
+            __call = function(t, ...)
 
-            local args = {...}
-            local env = {self = privateObj}
-            setmetatable(env, {__index = _G})
+                local privateObj = {}
 
-            if classdef.extends then
-                local superClass = import(classdef.extends)
-                local super = superClass:new(unpack(args))
+                local super
+                if classdef.extends then
+                    local superClass = import(classdef.extends)
+                    super = superClass(...)
+                    privateObj.super = super
+                end
 
-                for funcName, func in pairs(super) do
-                    if type(func) == "function" and funcName ~= "constructor" then
-                        privateObj[funcName] = func
-                        publicObj[funcName] = func
+                local private_mt = {}
+
+                local function wrapperFunction(_, ...)
+                    return private_mt.func(privateObj, ...)
+                end
+
+                private_mt.__index = function(t, k)
+                    local func = classdef.privateDefs[k] or classdef.publicDefs[k]
+                    if type(func) == "function" then
+                        private_mt.func = func
+                        return wrapperFunction
                     end
+
+                    return rawget(t, k)
                 end
 
-                env.super = super
-            end
+                setmetatable(privateObj, private_mt)
 
-            for funcName, func in pairs(classdef.privateDefs) do
-                local clone_func = loadstring(string.dump(func))
-                privateObj[funcName] = clone_func
-                publicObj[funcName] = function()
-                    error("Error. Trying to access private member "..funcName)
+                local public_mt = {
+                    __index = function(t, k)
+                        if isPublic(classdef, k) and not isPrivate(classdef, k) then
+                            return privateObj[k]
+                        elseif isPrivate(classdef, k) then
+                            error("Trying to access private member "..tostring(k))
+                        elseif inSuper(classdef, k) then
+                            return rawget(privateObj, "super")[k]
+                        else
+                            error("Trying to access non existing member "..tostring(k))
+                        end
+                    end;
+                    __newindex = function(t, k)
+                        error("Adding new indices for classes is not allowed")
+                    end;
+                }
+
+                local publicObj = setmetatable({}, public_mt)
+
+                local constructor = classdef.publicDefs.constructor
+                if constructor then
+                    constructor(privateObj, ...)
                 end
-            end
 
-            for funcName, func in pairs(classdef.publicDefs) do
-                local clone_func = loadstring(string.dump(func))
-                privateObj[funcName] = clone_func
-                publicObj[funcName] = clone_func
+                return publicObj
             end
+        }
 
-            for _, v in pairs(privateObj) do
-                if type(v) == "function" then
-                    setfenv(v, env)
-                end
-            end
-
-            if publicObj.constructor then
-                publicObj.constructor(unpack(args))
-                publicObj.constructor = nil
-            end
-
-            return publicObj
-        end
+        classes[name].class = setmetatable( {}, class_mt )
         classes.currentDef = nil
     end
 end
