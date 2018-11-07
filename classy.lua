@@ -24,6 +24,21 @@ local function public(tab)
     end
 end
 
+local function isPrivate(classdef, key)
+    return classdef.privateDefs[key] ~= nil
+end
+
+local function isPublic(classdef, key)
+    return classdef.publicDefs[key] ~= nil
+end
+
+local function inSuper(classdef, key)
+    if classdef.extends then
+        return classes[classdef.extends].publicDefs[key] ~= nil
+    end
+    return false
+end
+
 local function class(name)
     classes.currentDef = name
     classes[classes.currentDef] = {
@@ -41,63 +56,54 @@ local function class(name)
             __call = function(t, ...)
 
                 local privateObj = {}
-                local env = {self = privateObj}
-                setmetatable(env, {__index = _G})
 
-                local superDef
                 local super
                 if classdef.extends then
-                    superDef = classes[classdef.extends]
                     local superClass = import(classdef.extends)
                     super = superClass(...)
-                    env.super = super
+                    privateObj.super = super
                 end
 
-                setmetatable(privateObj, {__index = function(t, k)
+                local private_mt = {}
+
+                local function wrapperFunction(_, ...)
+                    return private_mt.func(privateObj, ...)
+                end
+
+                private_mt.__index = function(t, k)
                     local func = classdef.privateDefs[k] or classdef.publicDefs[k]
-
-                    if type( func ) == "function" then
-                        return setfenv(func, env)
+                    if type(func) == "function" then
+                        private_mt.func = func
+                        return wrapperFunction
                     end
 
-                    if not func and superDef then
-                        return super[k]
-                    end
+                    return rawget(t, k)
+                end
 
-                    return func
-                end} )
+                setmetatable(privateObj, private_mt)
 
                 local public_mt = {
                     __index = function(t, k)
-                        if not classdef.publicDefs[k] then
-                            if superDef then
-                                if not superDef.publicDefs[k] then
-                                    return
-                                end
-                            else
-                                return
-                            end
+                        if isPublic(classdef, k) and not isPrivate(classdef, k) then
+                            return privateObj[k]
+                        elseif isPrivate(classdef, k) then
+                            error("Trying to access private member "..tostring(k))
+                        elseif inSuper(classdef, k) then
+                            return rawget(privateObj, "super")[k]
+                        else
+                            error("Trying to access non existing member "..tostring(k))
                         end
-
-                        local func = classdef.publicDefs[k]
-
-                        if type(func) == "function" then
-                            return setfenv(func, env)
-                        end
-
-                        if not func and superDef then
-                            return super[k]
-                        end
-
-                        return func
+                    end;
+                    __newindex = function(t, k)
+                        error("Adding new indices for classes is not allowed")
                     end;
                 }
 
                 local publicObj = setmetatable({}, public_mt)
 
-                local constructor = publicObj.constructor
+                local constructor = classdef.publicDefs.constructor
                 if constructor then
-                    constructor(...)
+                    constructor(privateObj, ...)
                 end
 
                 return publicObj

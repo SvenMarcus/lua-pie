@@ -10,7 +10,7 @@ local import = classy.import
 
 class "OneDimGrid" {
 	public {
-		constructor = function()
+		constructor = function(self)
 			self.numNodes = 0
 			self.length = 0.0
 			self.gridDelta = 0.0
@@ -18,7 +18,7 @@ class "OneDimGrid" {
 			self.nodeValues = {}
 		end;
 
-		setNumNodes = function(num)
+		setNumNodes = function(self, num)
 			self.numNodes = num
 
 			for _=1, num do
@@ -26,65 +26,65 @@ class "OneDimGrid" {
 				table.insert(self.nodeValues, 0)
 			end
 
-			self.calcGridDelta()
-			self.calcCoordinates()
+			self:calcGridDelta()
+			self:calcCoordinates()
 		end;
 
-		setLength = function(l)
+		setLength = function(self, l)
 			self.length = l
 		end;
 
-		setNodeValues = function(values)
+		setNodeValues = function(self, values)
 			self.nodeValues = values
 		end;
 
-		setLeftBC = function(bc)
+		setLeftBC = function(self, bc)
 			self.nodeValues[1] = bc
 		end;
 
-		setRightBC = function(bc)
+		setRightBC = function(self, bc)
 			self.nodeValues[#self.nodeValues] = bc
 		end;
 
-		setGridNodeValue = function(index, value)
+		setGridNodeValue = function(self, index, value)
 			self.nodeValues[index] = value
 		end;
 
-		getNumNodes = function()
+		getNumNodes = function(self)
 			return self.numNodes
 		end;
 
-		getLength = function()
+		getLength = function(self)
 			return self.length
 		end;
 
-		getGridDelta = function()
+		getGridDelta = function(self)
 			return self.gridDelta
 		end;
 
-		getCoordinateOf = function(node)
+		getCoordinateOf = function(self, node)
 			return self.coordinates[node]
 		end;
 
-		getLeftBC = function()
+		getLeftBC = function(self)
 			return self.nodeValues[1]
 		end;
 
-		getRightBC = function()
+		getRightBC = function(self)
 			return self.nodeValues[#self.nodeValues]
 		end;
 
-		getNodeValues = function()
+		getNodeValues = function(self)
 			return self.nodeValues
 		end
 	};
 
 	private {
-		calcGridDelta = function()
+		calcGridDelta = function(self)
 			self.gridDelta = self.length / (self.numNodes - 1)
 		end;
 
-		calcCoordinates = function()
+		calcCoordinates = function(self)
 			for i=1, self.numNodes do
 				self.coordinates[i] = (i - 1) * self.gridDelta
 			end
@@ -94,75 +94,75 @@ class "OneDimGrid" {
 
 class "GridSolver" {
 	public {
-		constructor = function(grid, func)
+		constructor = function(self, grid, func)
 			self.func = func
 			self.grid = grid
-			self.gridDelta = self.grid.getGridDelta()
+			self.gridDelta = self.grid:getGridDelta()
 			self.lastStepValues = nil
 			self.newStepValues = nil
-			self.initArrays()
+			self:initArrays()
 		end;
 
-		solve = function()
+		solve = function(self)
 			local delta
-			self.gridDelta = self.grid.getGridDelta()
+			self.gridDelta = self.grid:getGridDelta()
 
 			repeat
 				delta = 0.0
 
-				for i=2, (self.grid.getNumNodes() - 1) do
-					self.calculateNewData(i)
-					delta = self.calculateDelta(delta, i)
+				for i=2, (self.grid:getNumNodes() - 1) do
+					self:calculateNewData(i)
+					delta = self:calculateDelta(delta, i)
 				end
 
-				self.swap()
+				self:swap()
 			until (delta < self.exitCondition)
 
-			self.grid.setNodeValues(self.newStepValues)
+			self.grid:setNodeValues(self.newStepValues)
 		end;
 
-		setExitCondition = function(ec)
+		setExitCondition = function(self, ec)
 			self.exitCondition = ec
 		end;
 
-		setGrid = function(grid)
+		setGrid = function(self, grid)
 			self.grid = grid
-			self.initArrays()
+			self:initArrays()
 		end;
 
-		setFunction = function(func)
+		setFunction = function(self, func)
 			self.func = func
 		end;
 	};
 
 	private {
-		initArrays = function()
-			local numNodes = self.grid.getNumNodes()
-			self.lastStepValues = self.zeros(numNodes)
-			self.newStepValues = self.zeros(numNodes)
-			self.lastStepValues[1] = self.grid.getLeftBC()
-			self.lastStepValues[#self.lastStepValues] = self.grid.getRightBC()
-			self.newStepValues[1] = self.grid.getLeftBC()
-			self.newStepValues[#self.newStepValues] = self.grid.getRightBC()
+		initArrays = function(self)
+			local numNodes = self.grid:getNumNodes()
+			self.lastStepValues = self:zeros(numNodes)
+			self.newStepValues = self:zeros(numNodes)
+			self.lastStepValues[1] = self.grid:getLeftBC()
+			self.lastStepValues[#self.lastStepValues] = self.grid:getRightBC()
+			self.newStepValues[1] = self.grid:getLeftBC()
+			self.newStepValues[#self.newStepValues] = self.grid:getRightBC()
 		end;
 
-		calculateNewData = function(index)
-			local coord = self.grid.getCoordinateOf(index)
+		calculateNewData = function(self, index)
+			local coord = self.grid:getCoordinateOf(index)
 			local data = 0.5 * (self.lastStepValues[index + 1] +self.lastStepValues[index - 1] - self.gridDelta * self.gridDelta * self.func(coord))
 			self.newStepValues[index] = data
 		end;
 
-		calculateDelta = function(lastDelta, index)
+		calculateDelta = function(self, lastDelta, index)
 			return math.max(math.abs(self.newStepValues[index] - self.lastStepValues[index]), lastDelta)
 		end;
 
-		swap = function()
+		swap = function(self)
 			local tmp = self.lastStepValues
 			self.lastStepValues = self.newStepValues
 			self.newStepValues = tmp
 		end;
 
-		zeros = function(num)
+		zeros = function(self, num)
 			local t = {}
 			for _=1, num do
 				table.insert(t, 0)
@@ -187,23 +187,24 @@ local func = function(x)
 end
 
 local grid = OneDimGrid()
-grid.setLength(length)
-grid.setLeftBC(leftBC)
-grid.setRightBC(rightBC)
+grid:setLength(length)
+grid:setLeftBC(leftBC)
+grid:setRightBC(rightBC)
+print(tostring(grid:getNumNodes()))
 
 local solver = GridSolver(grid, func)
-solver.setExitCondition(1e-15)
-solver.setFunction(func)
+solver:setExitCondition(1e-15)
+solver:setFunction(func)
 
 local start = os.clock()
 
-for i=1, nMax do
+for i=1, 6 do
 	numNodes = numNodes * 2
-	grid.setNumNodes(numNodes)
+	grid:setNumNodes(numNodes)
 
-	solver.setGrid(grid)
-	solver.solve()
-	local values = grid.getNodeValues()
+	solver:setGrid(grid)
+	solver:solve()
+	local values = grid:getNodeValues()
 	print("Num nodes: "..numNodes)
 	-- print(unpack(values))
 	print("=========================")
