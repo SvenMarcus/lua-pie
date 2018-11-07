@@ -1,6 +1,23 @@
+local WARNINGS = true
+local ALLOW_WRITING = false
+
 local classes = {
     currentDef = nil
 }
+
+local function show_warnings(bool)
+    WARNINGS = bool
+end
+
+local function allow_writing_to_objects(bool)
+    ALLOW_WRITING = bool
+end
+
+local function warning(warning)
+    if WARNINGS then
+        print("** WARNING! "..warning.." **")
+    end
+end
 
 local function import(name)
     return classes[name].class
@@ -120,13 +137,14 @@ local function class(name)
                                 error("Trying to access non existing member "..tostring(k))
                             end
                         end;
-                        __newindex = function(_, k, v)
+                        __newindex = function(t, k, v)
                             local static_member = classdef.staticDefs[k]
                             if static_member then
                                 classdef.staticDefs[k] = v
-                                return
+                            elseif ALLOW_WRITING then
+                                rawset(t, k, v)
+                                warning("Setting keys for classes from outside is not intended. Objects will not be able to use new keys.")
                             end
-                            error("Adding new indices for classes is not allowed")
                         end;
                     }
 
@@ -146,6 +164,8 @@ local function class(name)
 end
 
 return {
+    show_warnings = show_warnings,
+    allow_writing_to_objects = allow_writing_to_objects,
     static = static,
     private = private,
     public = public,

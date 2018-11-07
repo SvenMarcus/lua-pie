@@ -202,7 +202,7 @@ solver:setFunction(func)
 
 local start = os.clock()
 
-for i=1, 6 do
+for i=1, nMax do
 	numNodes = numNodes * 2
 	grid:setNumNodes(numNodes)
 
