@@ -4,7 +4,7 @@ Classy is class library prototype for Lua.
 
 ## Overview
 
-Currently classy supports private and public methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
+Currently classy supports private, public and static methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
 
 ## Usage
 
