@@ -24,7 +24,7 @@ class "Greeter" {
 
 class "Person" {
 
-	-- extends "Greeter";
+	extends "Greeter";
 
     public {
 		constructor = function(self, name)
