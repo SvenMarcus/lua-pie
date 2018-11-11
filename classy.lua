@@ -23,8 +23,8 @@ local function import(name)
     return classes[name].class
 end
 
-local function extends(className)
-    classes[classes.currentDef].extends = className
+local function extends(name)
+    classes[classes.currentDef].extends = name
 end
 
 local function private(tab)
