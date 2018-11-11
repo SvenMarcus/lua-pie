@@ -1,3 +1,6 @@
+--- Classes in Lua
+-- @module classy
+
 local WARNINGS = true
 local ALLOW_WRITING = false
 
@@ -5,28 +8,42 @@ local classes = {
     currentDef = nil
 }
 
+---
+-- @section functions
+
+--- Toggle displaying of warnings.
+-- @tparam boolean bool Whether or not to show warnings
 local function show_warnings(bool)
     WARNINGS = bool
 end
 
+--- Toggle writing to objects.
+-- @tparam boolean bool Whether or not objects may be written to
 local function allow_writing_to_objects(bool)
     ALLOW_WRITING = bool
 end
 
+--- Show a warning when warnings are enabled.
+-- @tparam string warning The warning message.
 local function warning(warning)
     if WARNINGS then
         print("** WARNING! "..warning.." **")
     end
 end
 
+--- Imports a class.
+-- @tparam string name The name of the class to import
 local function import(name)
     return classes[name].class
 end
 
-local function extends(className)
-    classes[classes.currentDef].extends = className
+--- Extends a with another class
+-- @tparam string name The name of the class to extend with
+local function extends(name)
+    classes[classes.currentDef].extends = name
 end
 
+--- Defines private methods in a class definition.
 local function private(tab)
     for key, value in pairs(tab) do
         if type(value) == "function" then
@@ -37,6 +54,7 @@ local function private(tab)
     end
 end
 
+--- Defines public methods in a class definition.
 local function public(tab)
     for key, value in pairs(tab) do
         if type(value) == "function" then
@@ -47,12 +65,14 @@ local function public(tab)
     end
 end
 
+--- Defines static methods in a class definition.
 local function static(tab)
     for key, value in pairs(tab) do
         classes[classes.currentDef].staticDefs[key] = value
     end
 end
 
+--- Returns whether or not a public function is defined in the parent class.
 local function inSuper(classdef, key)
     if classdef.extends then
         return classes[classdef.extends].publicFuncDefs[key] ~= nil
@@ -60,6 +80,11 @@ local function inSuper(classdef, key)
     return false
 end
 
+--- Creates a new class.
+-- @usage
+-- classy.class {
+--   -- todo: write
+-- }
 local function class(name)
     classes.currentDef = name
     classes[classes.currentDef] = {
