@@ -111,10 +111,18 @@ end
 --- Creates a new class.
 -- @function class
 -- @tparam string name The class name
+-- @return A function that accepts a table with private, public and static definitions
 -- @usage
--- classy.class {
---   -- todo: write
+-- class "MyClass" {
+--    extends "Parent";
+--    static { ... };
+--    private { ... };
+--    public { ... };
 -- }
+-- @see extends
+-- @see static
+-- @see private
+-- @see public
 local function class(name)
     classes.currentDef = name
     classes[classes.currentDef] = {
