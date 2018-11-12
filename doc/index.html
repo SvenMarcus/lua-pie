@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>classy</h1>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#"> </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>classy</strong></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="examples/examples.lua.html">examples.lua</a></li>
+  <li><a href="examples/main.lua.html">main.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>classy</code></h1>
+<p>Classes in Lua</p>
+<p>
+
+</p>
+
+
+<h2><a href="#"> </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#show_warnings">show_warnings (bool)</a></td>
+	<td class="summary">Toggle displaying of warnings.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#allow_writing_to_objects">allow_writing_to_objects (bool)</a></td>
+	<td class="summary">Toggle writing to objects.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#import">import (name)</a></td>
+	<td class="summary">Imports a class.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#extends">extends (name)</a></td>
+	<td class="summary">Extends a with another class</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#private">private (tab)</a></td>
+	<td class="summary">Defines private methods in a class definition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#public">public (tab)</a></td>
+	<td class="summary">Defines public methods in a class definition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#static">static (tab)</a></td>
+	<td class="summary">Defines static methods in a class definition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#class">class (name)</a></td>
+	<td class="summary">Creates a new class.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name=""></a> </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "show_warnings"></a>
+    <strong>show_warnings (bool)</strong>
+    </dt>
+    <dd>
+    Toggle displaying of warnings.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">bool</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Whether or not to show warnings
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "allow_writing_to_objects"></a>
+    <strong>allow_writing_to_objects (bool)</strong>
+    </dt>
+    <dd>
+    Toggle writing to objects.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">bool</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Whether or not objects may be written to
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "import"></a>
+    <strong>import (name)</strong>
+    </dt>
+    <dd>
+    Imports a class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The name of the class to import
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "extends"></a>
+    <strong>extends (name)</strong>
+    </dt>
+    <dd>
+    Extends a with another class
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The name of the class to extend with
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "private"></a>
+    <strong>private (tab)</strong>
+    </dt>
+    <dd>
+    Defines private methods in a class definition.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         A table containing private function definitions
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">private {
+   my_func = <span class="keyword">function</span>(self, args)
+   <span class="keyword">end</span>
+}</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "public"></a>
+    <strong>public (tab)</strong>
+    </dt>
+    <dd>
+    Defines public methods in a class definition.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         A table containing public function definitions
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">public {
+   my_func = <span class="keyword">function</span>(self, args)
+   <span class="keyword">end</span>
+}</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "static"></a>
+    <strong>static (tab)</strong>
+    </dt>
+    <dd>
+    Defines static methods in a class definition.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         A table containing static function definitions or variables
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">static {
+   my_var = <span class="number">5</span>;
+   my_func = <span class="keyword">function</span>(self, args)
+   <span class="keyword">end</span>
+}</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "class"></a>
+    <strong>class (name)</strong>
+    </dt>
+    <dd>
+    Creates a new class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The class name
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">classy.class {
+  <span class="comment">-- todo: write
+</span>}</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2018-11-12 01:39:38 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
