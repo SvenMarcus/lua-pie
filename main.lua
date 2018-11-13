@@ -22,3 +22,8 @@ slim:say_hello("World")
 print("Number of persons: "..slim.count)
 
 jimmy:introduce()
+
+local Number = import("Number")
+
+print((Number(3) + Number(4)))
+

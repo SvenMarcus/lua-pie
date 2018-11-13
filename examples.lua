@@ -3,6 +3,7 @@ local class = classy.class
 local static = classy.static
 local public = classy.public
 local private = classy.private
+local operators = classy.operators
 local extends = classy.extends
 
 class "Greeter" {
@@ -51,4 +52,27 @@ class "Person" {
 			print("Hi! My name is "..self.name)
 		end;
 	};
+}
+
+local Number
+Number = class "Number" {
+	public {
+		constructor = function(self, value)
+			self.value = value
+		end;
+
+		getValue = function(self)
+			return self.value
+		end;
+	};
+
+	operators {
+		__add = function(self, n2)
+			return Number(self.value + n2:getValue())
+		end;
+
+		__tostring = function(self)
+			return tostring(self.value)
+		end
+	}
 }

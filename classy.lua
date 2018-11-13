@@ -4,6 +4,11 @@
 local WARNINGS = true
 local ALLOW_WRITING = false
 
+local FORBIDDEN_OPERATORS = {
+    __index = true,
+    __newindex = true
+}
+
 local classes = {
     currentDef = nil
 }
@@ -37,6 +42,9 @@ end
 --- Imports a class.
 -- @function import
 -- @tparam string name The name of the class to import
+-- @usage
+-- local MyClass = import("MyClass")
+-- local instance = MyClass()
 local function import(name)
     return classes[name].class
 end
@@ -99,6 +107,28 @@ local function static(tab)
     end
 end
 
+--- Allows adding metamethods for operators.
+-- The first parameter of the metamethod is the object (self) and allows access to private members. 
+-- __index and __newindex are currently not allowed.
+-- @function operators
+-- @tparam table tab A table containing operator function definitions.
+-- @usage
+-- operators {
+--     __add = function(self, other)
+--     end
+-- }
+local function operators(tab)
+    for key, value in pairs(tab) do
+        if type(value) ~= "function" then
+            error("Operator must be function")
+        elseif FORBIDDEN_OPERATORS[key] then
+            error("Operator "..tostring(key).." is not allowed for classes.")
+        else
+            classes[classes.currentDef].operators[key] = value
+        end
+    end
+end
+
 --- Returns whether or not a public function is defined in the parent class.
 -- @local in_super
 local function in_super(classdef, key)
@@ -129,10 +159,21 @@ local function class(name)
         staticDefs = {},
         privateFuncDefs = {},
         publicFuncDefs = {},
+        operators = {},
         extends = nil,
-        class = nil
+        class = nil,
+        getClass = function()
+            return name
+        end
     }
 
+    --- Anonymous function returned by class() that accepts a table as a class body.
+    -- Private, public, static and operator members must be declared in the input table.
+    -- @function class_body
+    -- @tparam table tab 
+    -- @return the created class table that can be instantiated by calling it (same as import("ClassName")).
+    -- @see class
+    -- @see import
     return function(_)
 
         local classdef = classes[name]
@@ -211,6 +252,13 @@ local function class(name)
                         end;
                     }
 
+                    for operator, func in pairs(classdef.operators) do
+                        private_mt[operator] = func
+                        public_mt[operator] = function(t, ...)
+                            return private_mt[operator](privateObj, ...)
+                        end
+                    end
+
                     local publicObj = setmetatable({}, public_mt)
 
                     local constructor = classdef.publicFuncDefs.constructor
@@ -223,6 +271,8 @@ local function class(name)
         })
 
         classes.currentDef = nil
+
+        return classes[name].class
     end
 end
 
@@ -232,6 +282,7 @@ return {
     static = static,
     private = private,
     public = public,
+    operators = operators,
     extends = extends,
     class = class,
     import = import
