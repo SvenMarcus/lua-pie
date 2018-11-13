@@ -118,3 +118,31 @@ slim:say_hello("World")
 -- Hello Override
 
 ```
+
+### Operators
+
+```
+-- Number has to be declared first, so we can use it within the class
+local Number
+Number = class "Number" {
+	public {
+		constructor = function(self, value)
+			self.value = value
+		end;
+
+		getValue = function(self)
+			return self.value
+		end;
+	};
+
+	operators {
+		__add = function(self, n2)
+			return Number(self.value + n2:getValue())
+		end;
+
+		__tostring = function(self)
+			return tostring(self.value)
+		end
+	}
+}
+```
