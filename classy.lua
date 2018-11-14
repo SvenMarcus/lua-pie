@@ -170,7 +170,7 @@ local function class(name)
     --- Anonymous function returned by class() that accepts a table as a class body.
     -- Private, public, static and operator members must be declared in the input table.
     -- @function class_body
-    -- @tparam table tab 
+    -- @tparam table tab
     -- @return the created class table that can be instantiated by calling it (same as import("ClassName")).
     -- @see class
     -- @see import
