@@ -10,7 +10,7 @@ Currently classy supports private, public and static methods as well as inherita
 
 ### Writing classes
 
-```
+```lua
 local classy = require "classy"
 local class = classy.class
 local public = classy.public
@@ -35,7 +35,7 @@ class "Greeter" {
 
 ### Instantiating objects
 
-```
+```lua
 local classy = require "classy"
 local import = classy.import
 
@@ -51,7 +51,7 @@ greeter:private_hello("World")
 
 ### Inheritance
 
-```
+```lua
 local classy = require "classy"
 local class = classy.class
 local public = classy.public
@@ -86,7 +86,7 @@ slim:say_hello("World")
 
 ### Polymorphism
 
-```
+```lua
 class "Person" {
 
     extends "Greeter";
@@ -121,7 +121,7 @@ slim:say_hello("World")
 
 ### Operators
 
-```
+```lua
 -- Number has to be declared first, so we can use it within the class
 local Number
 Number = class "Number" {
