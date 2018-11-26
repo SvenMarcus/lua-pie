@@ -6,6 +6,16 @@ lua-pie (polymorphism, ineritance and encapsulation) is a class library prototyp
 
 Currently lua-pie supports private, public and static methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
 
+## Installation
+
+You can download lua-pie from luarocks with
+
+```
+luarocks install lua-pie
+```
+
+Or you can just clone or download this repository from github and use `lua-pie.lua` in your project.
+
 ## Usage
 
 ### Writing classes
