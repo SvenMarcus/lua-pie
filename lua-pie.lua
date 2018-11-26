@@ -1,5 +1,5 @@
---- Classes in Lua
--- @module classy
+--- Classes in Lua with lua-pie (polymorphism, inheritance, encapsulation)
+-- @module lua-pie
 
 local WARNINGS = true
 local ALLOW_WRITING = false
@@ -141,18 +141,20 @@ end
 --- Creates a new class.
 -- @function class
 -- @tparam string name The class name
--- @return A function that accepts a table with private, public and static definitions
+-- @return A function that accepts a table with private, public, static and operator definitions
 -- @usage
 -- class "MyClass" {
 --    extends "Parent";
 --    static { ... };
 --    private { ... };
 --    public { ... };
+--    operators { ... };
 -- }
 -- @see extends
 -- @see static
 -- @see private
 -- @see public
+-- @see operators
 local function class(name)
     classes.currentDef = name
     classes[classes.currentDef] = {
@@ -236,7 +238,7 @@ local function class(name)
                             elseif isPrivate then
                                 error("Trying to access private member "..tostring(k))
                             elseif in_super(classdef, k) then
-                                return rawget(privateObj, "super")[k]
+                                return super[k]
                             else
                                 error("Trying to access non existing member "..tostring(k))
                             end
@@ -254,7 +256,7 @@ local function class(name)
 
                     for operator, func in pairs(classdef.operators) do
                         private_mt[operator] = func
-                        public_mt[operator] = function(t, ...)
+                        public_mt[operator] = function(_, ...)
                             return private_mt[operator](privateObj, ...)
                         end
                     end

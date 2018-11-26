@@ -1,5 +1,5 @@
 format='markdown'
-project = 'classy'
+project = 'lua-pie'
 examples = {'examples.lua', 'main.lua'}
-file = {'classy.lua'}
+file = {'lua-pie.lua'}
 use_markdown_titles=true

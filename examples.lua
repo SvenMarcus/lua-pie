@@ -1,10 +1,10 @@
-local classy = require("classy")
-local class = classy.class
-local static = classy.static
-local public = classy.public
-local private = classy.private
-local operators = classy.operators
-local extends = classy.extends
+local pie = require("lua-pie")
+local class = pie.class
+local static = pie.static
+local public = pie.public
+local private = pie.private
+local operators = pie.operators
+local extends = pie.extends
 
 class "Greeter" {
 

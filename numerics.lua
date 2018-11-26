@@ -1,13 +1,13 @@
 math = require "math"
 local os = require "os"
 
-local classy = require "classy"
-local class = classy.class
-local static = classy.static
-local public = classy.public
-local private = classy.private
-local extends = classy.extends
-local import = classy.import
+local pie = require("lua-pie")
+local class = pie.class
+local static = pie.static
+local public = pie.public
+local private = pie.private
+local extends = pie.extends
+local import = pie.import
 
 class "OneDimGrid" {
 	public {
@@ -202,7 +202,7 @@ solver:setFunction(func)
 
 local start = os.clock()
 
-for i=1, nMax do
+for i=1, 6 do
 	numNodes = numNodes * 2
 	grid:setNumNodes(numNodes)
 

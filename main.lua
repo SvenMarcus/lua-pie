@@ -1,6 +1,6 @@
 require "examples"
-local classy = require "classy"
-local import = classy.import
+local pie = require("lua-pie")
+local import = pie.import
 
 local Greeter = import("Greeter")
 local greeter = Greeter()

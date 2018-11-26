@@ -1,20 +1,20 @@
-# classy
+# lua-pie
 
-Classy is class library prototype for Lua.
+lua-pie (polymorphism, ineritance and encapsulation) is a class library prototype for Lua.
 
 ## Overview
 
-Currently classy supports private, public and static methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
+Currently lua-pie supports private, public and static methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
 
 ## Usage
 
 ### Writing classes
 
 ```lua
-local classy = require "classy"
-local class = classy.class
-local public = classy.public
-local private = classy.private
+local pie = require "lua-pie"
+local class = pie.class
+local public = pie.public
+local private = pie.private
 
 
 class "Greeter" {
@@ -36,8 +36,8 @@ class "Greeter" {
 ### Instantiating objects
 
 ```lua
-local classy = require "classy"
-local import = classy.import
+local pie = require "lua-pie"
+local import = pie.import
 
 local Greeter = import("Greeter")
 local greeter = Greeter()
@@ -52,10 +52,10 @@ greeter:private_hello("World")
 ### Inheritance
 
 ```lua
-local classy = require "classy"
-local class = classy.class
-local public = classy.public
-local private = classy.private
+local pie = require "lua-pie"
+local class = pie.class
+local public = pie.public
+local private = pie.private
 
 
 class "Person" {
