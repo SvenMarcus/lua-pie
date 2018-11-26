@@ -1,7 +1,7 @@
 package = "lua-pie"
 version = "1.0-0"
 source = {
-   url = "https://github.com/SvenMarcus/lua-pie.git",
+   url = "git://github.com/SvenMarcus/lua-pie",
    tag = "v1.0",
 }
 description = {
