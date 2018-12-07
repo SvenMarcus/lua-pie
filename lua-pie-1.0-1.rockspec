@@ -1,8 +1,8 @@
 package = "lua-pie"
-version = "1.0-0"
+version = "1.0-1"
 source = {
    url = "git://github.com/SvenMarcus/lua-pie",
-   tag = "v1.0",
+   tag = "v1.01",
 }
 description = {
    summary = "A class library with encapsulation, inheritance and polymorphism.",
@@ -20,7 +20,10 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-         ["lua-pie"] = "lua-pie.lua"
+         ["lua-pie"] = "lua-pie.lua",
+         class = "class.lua",
+         interface = "interface.lua",
+         util = "util.lua"
    },
    copy_directories = { "doc" }
 }

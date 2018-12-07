@@ -1,23 +1,44 @@
-local pie = require("lua-pie")
+local pie = require "lua-pie"
 local class = pie.class
 local static = pie.static
 local public = pie.public
 local private = pie.private
 local operators = pie.operators
 local extends = pie.extends
+local interface = pie.interface
+local abstract_function = pie.abstract_function
+local implements = pie.implements
+
+interface "IGreeter" {
+
+	say_hello = abstract_function("self", "name")
+}
+
+interface "IShouter" {
+	shout = abstract_function()
+}
 
 class "Greeter" {
+
+	implements {
+		"IGreeter",
+		"IShouter"
+	};
 
 	public {
 		say_hello = function(self, name)
 			self:private_hello(name)
+		end;
+
+		shout = function(self)
+			print("I CAN SHOUT REALLY LOUD!")
 		end
 	};
 
 	private {
 		private_hello = function(self, name)
 			print("Hello "..name)
-		end
+		end;
 	}
 }
 
