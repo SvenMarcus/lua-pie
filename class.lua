@@ -137,6 +137,9 @@ return function(classes)
 	            __call = function(_, ...)
 
 	                    local privateObj = {}
+						local publicObj = {
+							privateObj = privateObj
+						}
 
 	                    local super
 	                    if classdef.extends then
@@ -220,7 +223,7 @@ return function(classes)
 	                        end
 	                    end
 
-	                    local publicObj = setmetatable({}, public_mt)
+	                    setmetatable(publicObj, public_mt)
 
 	                    local constructor = classdef.publicFuncDefs.constructor
 	                    if constructor then

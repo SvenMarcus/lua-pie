@@ -54,7 +54,6 @@ class "Person" {
 
 		constructor = function(self, name)
 			self.name = name
-			print(self.name)
 			self.count = self.count + 1
 		end;
 

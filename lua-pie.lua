@@ -1,9 +1,11 @@
 --- Classes in Lua with lua-pie (polymorphism, inheritance, encapsulation)
 -- @module lua-pie
 
-local classes = {}
+local classes = {
+    instances = {}
+}
 
-local class_definitions = require "class" (classes)
+local class_definitions = require "class_new" (classes)
 
 --- Imports a class.
 -- @function import

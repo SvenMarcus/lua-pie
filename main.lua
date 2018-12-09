@@ -13,19 +13,31 @@ greeter:say_hello("World")
 local Person = import "Person"
 local slim = Person("Slim Shady")
 
-print("Number of persons: "..Person.count)
 
-local jimmy = Person("Jimmy")
+-- -- print("Number of persons: "..Person.count)
+
+-- local jimmy = Person("Jimmy")
 
 slim:introduce()
-slim:say_hello("World")
+-- -- slim:say_hello("World")
 
-jimmy:shout()
+-- jimmy:introduce()
 
-print("Number of persons: "..slim.count)
+local start = os.clock()
+for i=1, 10000000 do
+    Greeter("Test")
+end
 
-jimmy:introduce()
+local _end = os.clock()
 
-local Number = import("Number")
+print(_end - start)
 
-print((Number(3) + Number(4)))
+
+
+-- print("Number of persons: "..slim.count)
+
+-- jimmy:introduce()
+
+-- local Number = import("Number")
+
+-- print((Number(3) + Number(4)))
