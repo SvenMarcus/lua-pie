@@ -1,10 +1,24 @@
 # lua-pie
 
-lua-pie (polymorphism, ineritance and encapsulation) is a class library prototype for Lua.
+## Table of contents
+
+- [lua-pie](#lua-pie)
+  - [Table of contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Writing classes](#writing-classes)
+    - [Instantiating objects](#instantiating-objects)
+    - [Inheritance](#inheritance)
+    - [Interfaces](#interfaces)
+    - [Polymorphism](#polymorphism)
+    - [Operators](#operators)
+  - [Important Notes](#important-notes)
 
 ## Overview
 
-Currently lua-pie supports interfaces with abstract methods and classes with private, public and static methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor.
+lua-pie (polymorphism, ineritance and encapsulation) is a class library for Lua.
+Currently lua-pie supports interfaces with abstract methods and classes with private, public and static methods as well as inheritance with polymorphism via the respective keywords. Private member variables can be declared with the `self` keyword in the constructor. Classes may also contain metamethods using the operator keyword.
 
 ## Installation
 
@@ -19,6 +33,9 @@ Or you can just clone or download this repository from github and use `lua-pie.l
 ## Usage
 
 ### Writing classes
+
+Classes are created with the `class` keyword followed by the name of the class and a table containing method definitions. Method definitions are wrappend in a public, private or static block.
+Currently the static block is the only one allowed to contain non-function values.
 
 ```lua
 local pie = require "lua-pie"
@@ -45,6 +62,8 @@ class "Greeter" {
 
 ### Instantiating objects
 
+Classes are imported via the `import` function. After that they can be called to create a new instance. If a `constructor` function is defined in the `public` block it will be called when creating the object.
+
 ```lua
 local pie = require "lua-pie"
 local import = pie.import
@@ -60,6 +79,8 @@ greeter:private_hello("World")
 ```
 
 ### Inheritance
+
+lua-pie allows single inheritance. A class can extend another class by using the `extends` function within the class definition.
 
 ```lua
 local pie = require "lua-pie"
@@ -95,6 +116,10 @@ slim:say_hello("World")
 ```
 
 ### Interfaces
+
+lua-pie also provides support for interfaces. Interfaces may only contain abstract functions. All functions are public by default.
+A class can implement an interface by using the `implements` function within the class definition. The argument to the `implements` function can either be a single class name as string or a table of class names.
+If a class does not implement all functions defined by an interface an error will be thrown.
 
 ```lua
 local pie = require "lua-pie"
@@ -141,6 +166,9 @@ class "Greeter" {
 
 ### Polymorphism
 
+Methods can be overriden in subclasses, thus enabling polymorphism. Moreover every derived class has a field `self.super` which is an instance of the super class.
+The super class instance will be created using the same arguments passed into the derived class constructor.
+
 ```lua
 class "Person" {
 
@@ -176,6 +204,19 @@ slim:say_hello("World")
 
 ### Operators
 
+Operators (metamethods) are defined within the `operators` block. Currently the following operators are supported:
+
+- __add
+- __sub
+- __mul
+- __div
+- __pow
+- __concat
+- __unm
+- __tostring
+- __call
+
+
 ```lua
 -- Number has to be declared first, so we can use it within the class
 local Number
@@ -200,4 +241,35 @@ Number = class "Number" {
 		end
 	}
 }
+```
+
+## Important Notes
+
+Due to the way the module is written, class methods can not be passed around like usual functions. In lua-pie when functions are called they are wrapped in a special wrapper function to pass in the private object table that is hidden from the user. When simply retrieving a function from an object it will always return the wrapper function. Below is a simple example:
+
+```lua
+local Greeter = import "Greeter"
+local Person = import "Person"
+
+greeter = Greeter()
+
+person = Person("A")
+
+local func = greeter.say_hello
+local func2 = person.introduce
+
+print(func == func2)
+-- true
+```
+
+Therefore if you want to pass functions around, always wrap them in another function first:
+
+```lua
+local Greeter = import "Greeter"
+
+greeter = Greeter()
+
+local func = function(name) greeter:say_hello(name) end
+
+func("World")
 ```

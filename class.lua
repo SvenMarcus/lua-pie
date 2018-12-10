@@ -310,7 +310,7 @@ return function(classes)
         local classdef = classes[className]
 
         local class_mt = {}
-        class_mt.__index = function(t, k)
+        class_mt.__index = function(_, k)
             return classdef.staticDefs[k]
         end
 
@@ -322,14 +322,14 @@ return function(classes)
             check_if_interfaces_are_implemented(className)
         end
 
-        class_mt.__call = function(_, ...)
+        class_mt.__call = function(t, ...)
             local private_obj = {
-                classdefName = className,
+                classdefName = t.className,
             }
 
             local public_obj = {
                 private_obj = private_obj,
-                classdefName = className,
+                classdefName = t.className,
             }
 
             setmetatable(private_obj, private_mt)
@@ -347,7 +347,7 @@ return function(classes)
             return setmetatable(public_obj, public_mt)
         end
 
-        classdef.class = setmetatable({}, class_mt)
+        classdef.class = setmetatable({className = className}, class_mt)
         classes.currentDef = nil
 
         return classdef.class
