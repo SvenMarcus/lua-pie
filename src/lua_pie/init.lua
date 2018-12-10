@@ -3,7 +3,7 @@
 
 local classes = {}
 
-local class_definitions = require "class" (classes)
+local class_definitions = require "lua_pie.class" (classes)
 
 --- Imports a class.
 -- @function import
@@ -93,7 +93,7 @@ local class = class_definitions.class
 -- @see class
 -- @see import
 
-local interface_definitions = require "interface" (classes)
+local interface_definitions = require "lua_pie.interface" (classes)
 
 --- Defines an interface.
 -- @function interface
@@ -116,7 +116,7 @@ local abstract_function = interface_definitions.abstract_function
 -- @param interfaces A single string with an interface name or a table of interface names
 local implements = interface_definitions.implements
 
-local util = require "util"
+local util = require "lua_pie.util"
 
 --- Check if an object is an instance of a class
 -- @function is

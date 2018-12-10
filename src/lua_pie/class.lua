@@ -1,4 +1,4 @@
-local util = require "util"
+local util = require "lua_pie.util"
 local warning = util.warning
 local writing_allowed = util.writing_allowed
 

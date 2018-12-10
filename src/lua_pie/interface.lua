@@ -1,5 +1,5 @@
 -- @module lua-pie
-local util = require "util"
+local util = require "lua_pie.util"
 local warning = util.warning
 
 return function(classes)
