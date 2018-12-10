@@ -1,10 +1,9 @@
--- @module lua-pie
-local util = require "lua_pie.util"
-local warning = util.warning
-
 return function(classes)
 
 	local function implements(interfaces)
+		if type(interfaces) == "string" then
+			interfaces = { interfaces }
+		end
 	    classes[classes.currentDef].implements = interfaces
 	end
 

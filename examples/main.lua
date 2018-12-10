@@ -32,7 +32,9 @@ local Number = import("Number")
 
 print((Number(3) + Number(4)))
 
-print(is(slim, "Person"))
+print("Is slim a Person?", is(slim, "Person"))
+print("Is slim a Greeter?", is(slim, "Greeter"))
+print("Is slim an IShouter?", is(slim, "IShouter"))
 print(is("string", "string"))
 
 print(tostring(Number(5)))

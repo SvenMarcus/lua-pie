@@ -116,9 +116,11 @@ local abstract_function = interface_definitions.abstract_function
 -- @param interfaces A single string with an interface name or a table of interface names
 local implements = interface_definitions.implements
 
-local util = require "lua_pie.util"
+local util = require "lua_pie.util" (classes)
 
---- Check if an object is an instance of a class
+--- Check if an object is an instance of a class.
+-- An object is also considered an instance of its super class, any of its implemented interfaces
+-- as well as any interface implemented by the super class.
 -- @function is
 -- @param object The object to compare
 -- @tparam string className the name of the class
