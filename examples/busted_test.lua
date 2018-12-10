@@ -1,7 +1,7 @@
 require 'busted.runner'()
 require "examples"
 
-local pie = require("lua-pie")
+local pie = require("lua_pie")
 local import = pie.import
 
 
