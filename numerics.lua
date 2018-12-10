@@ -139,8 +139,8 @@ class "GridSolver" {
 	private {
 		initArrays = function(self)
 			local numNodes = self.grid:getNumNodes()
-			self.lastStepValues = self.zeros(numNodes)
-			self.newStepValues = self.zeros(numNodes)
+			self.lastStepValues = self:zeros(numNodes)
+			self.newStepValues = self:zeros(numNodes)
 			self.lastStepValues[1] = self.grid:getLeftBC()
 			self.lastStepValues[#self.lastStepValues] = self.grid:getRightBC()
 			self.newStepValues[1] = self.grid:getLeftBC()
@@ -163,17 +163,25 @@ class "GridSolver" {
 			self.newStepValues = tmp
 		end;
 
-	};
-
-	static {
-		zeros = function(num)
+		zeros = function(self, num)
 			local t = {}
 			for _=1, num do
 				table.insert(t, 0)
 			end
 			return t
 		end;
-	}
+
+	};
+
+	-- static {
+	-- 	zeros = function(num)
+	-- 		local t = {}
+	-- 		for _=1, num do
+	-- 			table.insert(t, 0)
+	-- 		end
+	-- 		return t
+	-- 	end;
+	-- }
 }
 
 
@@ -202,7 +210,7 @@ solver:setFunction(func)
 
 local start = os.clock()
 
-for i=1, 6 do
+for i=1, nMax do
 	numNodes = numNodes * 2
 	grid:setNumNodes(numNodes)
 

@@ -67,12 +67,17 @@ local operators = class_definitions.operators
 -- @return A function that accepts a table with private, public, static and operator definitions
 -- @usage
 -- class "MyClass" {
+--    implements {
+--        "IMyInterface",
+--        "IAnotherInterface"
+--    };
 --    extends "Parent";
 --    static { ... };
 --    private { ... };
 --    public { ... };
 --    operators { ... };
 -- }
+-- @see implements
 -- @see extends
 -- @see static
 -- @see private
@@ -113,6 +118,12 @@ local implements = interface_definitions.implements
 
 local util = require "util"
 
+--- Check if an object is an instance of a class
+-- @function is
+-- @param object The object to compare
+-- @tparam string className the name of the class
+local is = util.is
+
 --- Toggle displaying of warnings.
 -- @function show_warnings
 -- @tparam boolean bool Whether or not to show warnings
@@ -122,6 +133,7 @@ local show_warnings = util.show_warnings
 -- @function allow_writing_to_objects
 -- @tparam boolean bool Whether or not objects may be written to
 local allow_writing_to_objects = util.allow_writing_to_objects
+
 
 return {
     show_warnings = show_warnings,
@@ -135,5 +147,6 @@ return {
     interface = interface,
     abstract_function = abstract_function,
     implements = implements,
+    is = is,
     import = import
 }

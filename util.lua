@@ -24,9 +24,18 @@ local function warning(warning)
     end
 end
 
+local function is(object, className)
+    if type(object) == "table" and object.getClass and type(object.getClass) == "function" then
+        return object.getClass() == className
+    end
+
+    return type(object) == className
+end
+
 return {
 	warning = warning,
 	show_warnings = show_warnings,
 	allow_writing_to_objects = allow_writing_to_objects,
-	writing_allowed = writing_allowed
+    writing_allowed = writing_allowed,
+    is = is
 }
