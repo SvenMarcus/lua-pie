@@ -1,4 +1,4 @@
-local pie = require "lua_pie"
+local pie = require "lua-pie"
 local class = pie.class
 local static = pie.static
 local public = pie.public

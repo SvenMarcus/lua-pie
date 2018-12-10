@@ -20,10 +20,10 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      lua_pie = "src/lua_pie/init.lua",
-      ["lua_pie.class"] = "src/lua_pie/class.lua",
-      ["lua_pie.interface"] = "src/lua_pie/interface.lua",
-      ["lua_pie.util"] = "src/lua_pie/util.lua"
+      ["lua-pie"] = "src/lua-pie/init.lua",
+      ["lua-pie.class"] = "src/lua-pie/class.lua",
+      ["lua-pie.interface"] = "src/lua-pie/interface.lua",
+      ["lua-pie.util"] = "src/lua-pie/util.lua"
    },
    copy_directories = {
       "doc"

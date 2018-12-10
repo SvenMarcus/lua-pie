@@ -1,6 +1,6 @@
 require "examples"
 
-local pie = require "lua_pie"
+local pie = require "lua-pie"
 local import = pie.import
 local is = pie.is
 
@@ -25,8 +25,6 @@ slim:say_hello("World")
 jimmy:introduce()
 
 print("Number of persons: "..slim.count)
-
-jimmy:introduce()
 
 local Number = import("Number")
 
