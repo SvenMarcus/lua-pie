@@ -2,6 +2,7 @@ require "examples"
 
 local pie = require "lua-pie"
 local import = pie.import
+local is = pie.is
 
 local Greeter = import "Greeter"
 local greeter = Greeter()
@@ -14,30 +15,35 @@ local Person = import "Person"
 local slim = Person("Slim Shady")
 
 
--- -- print("Number of persons: "..Person.count)
+print("Number of persons: "..Person.count)
 
--- local jimmy = Person("Jimmy")
+local jimmy = Person("Jimmy")
 
 slim:introduce()
--- -- slim:say_hello("World")
+slim:say_hello("World")
 
--- jimmy:introduce()
+jimmy:introduce()
 
-local start = os.clock()
-for i=1, 10000000 do
-    Greeter("Test")
-end
+print("Number of persons: "..slim.count)
 
-local _end = os.clock()
+jimmy:introduce()
 
-print(_end - start)
+local Number = import("Number")
+
+print((Number(3) + Number(4)))
+
+print(is(slim, "Person"))
+
+print(tostring(Number(5)))
+
+-- local start = os.clock()
+
+-- for i=1, 10000000 do
+--     Person("Test")
+-- end
+
+-- local stop = os.clock()
+
+-- print(stop - start)
 
 
-
--- print("Number of persons: "..slim.count)
-
--- jimmy:introduce()
-
--- local Number = import("Number")
-
--- print((Number(3) + Number(4)))
