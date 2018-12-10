@@ -27,12 +27,15 @@ jimmy:introduce()
 print("Number of persons: "..slim.count)
 
 jimmy:introduce()
+jimmy:set_name("John")
+jimmy:introduce()
 
 local Number = import("Number")
 
 print((Number(3) + Number(4)))
 
 print(is(slim, "Person"))
+print(is("string", "string"))
 
 print(tostring(Number(5)))
 

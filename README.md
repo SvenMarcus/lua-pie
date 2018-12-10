@@ -13,6 +13,7 @@
     - [Interfaces](#interfaces)
     - [Polymorphism](#polymorphism)
     - [Operators](#operators)
+    - [Utilities](#utilities)
   - [Important Notes](#important-notes)
 
 ## Overview
@@ -241,6 +242,47 @@ Number = class "Number" {
 		end
 	}
 }
+```
+
+### Utilities
+
+lua-pie also provides a few simple utility functions, the first being the function `is`.
+`is` takes an object and a class or type name as string and will return true if the given object is an instance of the specified type or class.
+
+```lua
+local slim = Person("Slim Shady")
+
+print(is(slim, "Person"))
+-- true
+print(is("string", "string"))
+-- true
+```
+
+In general lua-pie does not allow writing new indices to object. However this behavior can be turned off to enable working with test frameworks like `busted`.
+
+```lua
+require 'busted.runner'()
+require "examples"
+
+local pie = require("lua-pie")
+local import = pie.import
+
+
+describe("When testing busted spies", function()
+	it("should work", function()
+		pie.allow_writing_to_objects(true)
+		pie.show_warnings(false) -- if not turned off, lue-pie will warn the user about writing to objects
+
+		local Person = import("Person")
+
+		local slim = Person("Slim Shady")
+
+		local s = spy.on(slim, "introduce")
+		slim:introduce()
+
+		assert.spy(s).was.called()
+	end)
+end)
 ```
 
 ## Important Notes
