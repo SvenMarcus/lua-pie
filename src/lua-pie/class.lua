@@ -316,7 +316,7 @@ return function(classes)
 
         local class_mt = {}
         class_mt.__index = function(t, k)
-            local current = classes[rawget(t, "className")]
+            local current = classes[t.className]
             while current do
                 local static_member = current.staticDefs[k]
                 if static_member then
