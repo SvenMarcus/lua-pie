@@ -14,6 +14,7 @@ greeter:say_hello("World")
 local Person = import "Person"
 local slim = Person("Slim Shady")
 
+-- print(slim.name)
 
 print("Number of persons: "..Person.count)
 

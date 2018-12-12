@@ -17,6 +17,7 @@ return function(classes)
 	end
 
 	local function extends(name)
+        if type(name) ~= "string" then return end
 	    classes[classes.currentDef].extends = name
 	end
 
@@ -116,8 +117,6 @@ return function(classes)
     end
 
 
-    local func_storage = nil
-
     local public_mt = {}
 
     public_mt.__index = function(t, k)
@@ -125,8 +124,8 @@ return function(classes)
         local classdef = classes[classdefName]
         local public = classdef.publicFuncDefs[k]
 
-        if public then
-            local private_obj = rawget(t, "private_obj")
+        local private_obj = rawget(t, "private_obj")
+        if classdef.publicFuncDefs[k] then
             return private_obj[k]
         end
 
@@ -135,9 +134,17 @@ return function(classes)
             return static
         end
 
+        if classdef.extends then
+            return rawget(private_obj, "super")[k]
+        end
+
         local private = classdef.privateFuncDefs[k]
         if private then
             error("Trying to access private method "..tostring(k), 2)
+        end
+
+        if private_obj[k] then
+            error( "Trying to access private member "..tostring(k), 2)
         end
 
         error("Trying to access non existing member "..tostring(k), 2)
@@ -262,14 +269,11 @@ return function(classes)
 
     public_mt.__metatable = false
 
-    local function wrapper_function(t, ...)
-        local private_obj = t
-        local meta_private = rawget(t, "private_obj")
-        if meta_private then
-            private_obj = meta_private
-        end
+    local func_storage = nil
+    local call_object = nil
 
-        return func_storage(private_obj, ...)
+    function wrapper_function(_, ...)
+        return func_storage(call_object, ...)
     end
 
     local private_mt = {}
@@ -280,7 +284,9 @@ return function(classes)
 
         local func = classdef.privateFuncDefs[k] or classdef.operators[k]
         if func then
+            call_object = t
             func_storage = func
+
             return wrapper_function
         end
 
@@ -303,15 +309,22 @@ return function(classes)
         rawset(t, k, v)
     end
 
-
     local function class_body(tab)
 
         local className = classes.currentDef
         local classdef = classes[className]
 
         local class_mt = {}
-        class_mt.__index = function(_, k)
-            return classdef.staticDefs[k]
+        class_mt.__index = function(t, k)
+            local current = classes[rawget(t, "className")]
+            while current do
+                local static_member = current.staticDefs[k]
+                if static_member then
+                    return static_member
+                end
+
+                current = classes[current.extends]
+            end
         end
 
         if classdef.extends then
@@ -323,16 +336,11 @@ return function(classes)
         end
 
         class_mt.__call = function(t, ...)
-            local private_obj = {
-                classdefName = t.className,
-            }
+            local classdef = classes[t.className]
 
-            local public_obj = {
-                private_obj = private_obj,
+            local private_obj = setmetatable({
                 classdefName = t.className,
-            }
-
-            setmetatable(private_obj, private_mt)
+            }, private_mt)
 
             if classdef.extends then
                 local super = import(classdef.extends)(...)
@@ -344,7 +352,10 @@ return function(classes)
                 constructor(private_obj, ...)
             end
 
-            return setmetatable(public_obj, public_mt)
+            return setmetatable({
+                private_obj = private_obj,
+                classdefName = t.className,
+            }, public_mt)
         end
 
         classdef.class = setmetatable({className = className}, class_mt)

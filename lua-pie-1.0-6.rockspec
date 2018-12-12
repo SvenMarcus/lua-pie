@@ -1,8 +1,8 @@
 package = "lua-pie"
-version = "1.0-5"
+version = "1.0-6"
 source = {
    url = "git://github.com/SvenMarcus/lua-pie",
-   tag = "v1.05"
+   tag = "v1.06"
 }
 description = {
    summary = "A class library with encapsulation, inheritance and polymorphism.",
